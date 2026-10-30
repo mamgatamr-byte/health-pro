@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المساعد في خطابات مخالفات المقصف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&family=Almarai:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-green: #008A76;
+            --bg-color: #eef2f5;
+            --font-heading: 'Cairo', sans-serif;
+            --size-heading: 20pt;
+            --font-text: 'Cairo', sans-serif;
+            --size-text: 16pt;
+            --line-height: 1.8;
+            --top-margin: 3.5cm; 
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-text);
+        }
+        
+        body { background: var(--bg-color); padding: 20px; }
+        
+        .app-container {
+            max-width: 1400px; margin: auto; background: white;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* التبويبات */
+        .tabs-header {
+            display: flex; background: #1e3a5f; gap: 5px;
+            padding: 15px 20px 0 20px; flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: #2c5a8c; border: none; padding: 10px 20px;
+            font-size: 1rem; font-weight: bold; color: white;
+            border-radius: 10px 10px 0 0; cursor: pointer; transition: 0.2s;
+        }
+        .tab-btn.active { background: var(--brand-green); }
+        .tab-content { display: none; padding: 25px; background: #ffffff; }
+        .tab-content.active { display: block; }
+        
+        /* النماذج */
+        .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+            gap: 15px; margin-bottom: 20px; background: #f1f5f9;
+            padding: 20px; border-radius: 12px;
+        }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        label { font-weight: bold; color: #1f3a5f; font-size: 0.9rem; }
+        input, select, textarea {
+            padding: 10px; border: 1px solid #cbd5e1;
+            border-radius: 8px; font-size: 0.95rem; background: white;
+        }
+        textarea { resize: vertical; min-height: 80px; font-family: 'Tahoma', sans-serif; line-height: 1.5; }
+        button {
+            background: #2c5a8c; color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; transition: 0.2s; font-size: 1rem;
+        }
+        button:hover { opacity: 0.9; }
+        .btn-danger { background: #dc3545; padding: 5px 10px; font-size: 0.8rem; border-radius: 5px; }
+        
+        .docs-actions { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+
+        /* إدارة المخالفات */
+        .violation-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .violation-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f8fafc; padding: 10px 15px; border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        .violation-item label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 1rem; }
+        .violation-item input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+
+        details {
+            background: #f8fafc; border: 1px solid #cbd5e1;
+            border-radius: 8px; margin-bottom: 10px; padding: 10px;
+        }
+        summary {
+            font-weight: bold; color: #1e3a5f; cursor: pointer;
+            padding: 5px; font-size: 1.05rem;
+        }
+        details[open] summary { border-bottom: 1px solid #cbd5e1; margin-bottom: 15px; padding-bottom: 10px; }
+        
+        .hint-box {
+            background: #e0f2fe; color: #0369a1; padding: 15px;
+            border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px;
+            border-right: 4px solid #0369a1;
+        }
+
+        /* =========================================
+           ورقة A4 مع الخلفية المرفوعة
+           ========================================= */
+        .official-paper {
+            background-color: white;
+            background-image: url(''); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 210mm;
+            height: 297mm; 
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            direction: rtl;
+            color: #000;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            overflow: hidden;
+        }
+
+        .paper-content {
+            position: absolute;
+            top: var(--top-margin) !important; 
+            right: 3.1cm;
+            left: 3.1cm;
+            bottom: 1.75cm;
+            font-family: var(--font-text) !important;
+            font-size: var(--size-text) !important;
+            line-height: var(--line-height) !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doc-title {
+            text-align: center;
+            font-family: var(--font-heading) !important;
+            font-size: var(--size-heading) !important;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-decoration: underline;
+            text-underline-offset: 8px;
+        }
+
+        .paper-content p { margin-bottom: 10px; }
+        .paper-content p:last-child { margin-bottom: 0; }
+
+        /* قائمة النقاط */
+        .violations-ul {
+            margin-right: 25px;
+            margin-bottom: 15px;
+            list-style-type: disc;
+        }
+        .violations-ul li {
+            margin-bottom: 5px;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            flex-shrink: 0;
+        }
+        .images-grid img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px; 
+            padding-top: 10px;
+            font-size: var(--size-text) !important;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .sig-box { text-align: center; width: 200px; }
+
+        .image-preview-area { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .img-preview {
+            width: 80px; height: 80px; object-fit: cover;
+            border-radius: 8px; border: 2px solid #cbd5e1;
+        }
+
+        /* تذييل الواجهة */
+        .app-footer {
+            text-align: center;
+            padding: 15px;
+            background: #1e3a5f;
+            color: white;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border-top: 3px solid var(--brand-green);
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    
+    <!-- التبويبات -->
+    <div class="tabs-header no-print">
+        <button class="tab-btn" data-tab="tabSettings">⚙️ الإعدادات</button>
+        <button class="tab-btn active" data-tab="tabViolations">⚠️ المخالفات والشواهد</button>
+        <button class="tab-btn" data-tab="tabDocs">📄 إنتاج الوثائق</button>
+    </div>
+
+    <!-- تبويب الإعدادات -->
+    <div id="tabSettings" class="tab-content">
+        <h2 style="margin-bottom: 20px; color: #1e3a5f;">⚙️ الإعدادات الأساسية وتخصيص النصوص</h2>
+        
+        <div class="form-grid">
+            <div class="field"><label>🏫 اسم المدرسة:</label><input type="text" id="schoolName"></div>
+            <div class="field"><label>👨‍🏫 مدير المدرسة:</label><input type="text" id="principalName"></div>
+            <div class="field"><label>🩺 الموجه الصحي:</label><input type="text" id="healthSupervisor"></div>
+            <div class="field"><label>📅 التاريخ الهجري الافتراضي:</label><input type="text" id="defaultDate"></div>
+            <div class="field"><label>🏢 الجهة (مدير التعليم):</label><input type="text" id="directorName"></div>
+            <div class="field"><label>👷 اسم المتعهد الافتراضي:</label><input type="text" id="workerName"></div>
+            <div class="field"><label>🔢 رقم إقامة المتعهد:</label><input type="text" id="workerIqama"></div>
+        </div>
+
+        <!-- قسم تنسيق الخطوط -->
+        <h3 style="margin-bottom: 15px; color: #1e3a5f;">✍️ تنسيق الخطوط والفقرات</h3>
+        <div class="form-grid" style="background: #e0f2fe;">
+            <div class="field">
+                <label>خط العناوين:</label>
+                <select id="headingFontSelect">
+                    <option value="'Cairo', sans-serif">Cairo (عصري)</option>
+                    <option value="'Tajawal', sans-serif">Tajawal (أنيق)</option>
+                    <option value="'Almarai', sans-serif">Almarai (بسيط)</option>
+                    <option value="'Amiri', serif">Amiri (كلاسيكي)</option>
+                    <option value="'Noto Naskh Arabic', serif">Noto Naskh (رسمي)</option>
+                    <option value="'Arial', sans-serif">Arial (نظامي)</option>
+                    <option value="'Times New Roman', serif">Times New Roman (رسمي)</option>
+                    <option value="'Traditional Arabic', serif">Traditional Arabic (تراثي)</option>
+                    <option value="'Simplified Arabic', sans-serif">Simplified Arabic (واضح)</option>
+                    <option value="'Tahoma', sans-serif">Tahoma (مريح)</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>حجم العناوين:</label>
+                <select id="headingSizeSelect">
+                    <option value="16pt">16</option>
+                    <option value="18pt">18</option>
+                    <option value="20pt" selected>20</option>
+                    <option value="22pt">22</option>
+                    <option value="24pt">24</option>
+                    <option value="28pt">28</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>خط النصوص:</label>
+                <select id="textFontSelect">
+                    <option value="'Cairo', sans-serif">Cairo (عصري)</option>
+                    <option value="'Tajawal', sans-serif">Tajawal (أنيق)</option>
+                    <option value="'Almarai', sans-serif">Almarai (بسيط)</option>
+                    <option value="'Amiri', serif">Amiri (كلاسيكي)</option>
+                    <option value="'Noto Naskh Arabic', serif">Noto Naskh (رسمي)</option>
+                    <option value="'Arial', sans-serif">Arial (نظامي)</option>
+                    <option value="'Times New Roman', serif">Times New Roman (رسمي)</option>
+                    <option value="'Traditional Arabic', serif">Traditional Arabic (تراثي)</option>
+                    <option value="'Simplified Arabic', sans-serif">Simplified Arabic (واضح)</option>
+                    <option value="'Tahoma', sans-serif">Tahoma (مريح)</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>حجم النصوص:</label>
+                <select id="textSizeSelect">
+                    <option value="12pt">12</option>
+                    <option value="14pt">14</option>
+                    <option value="16pt" selected>16</option>
+                    <option value="18pt">18</option>
+                    <option value="20pt">20</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>تباعد الأسطر:</label>
+                <select id="lineHeightSelect">
+                    <option value="1.2">ضيق جداً (1.2)</option>
+                    <option value="1.5">ضيق (1.5)</option>
+                    <option value="1.8" selected>عادي (1.8)</option>
+                    <option value="2.0">واسع (2.0)</option>
+                    <option value="2.5">واسع جداً (2.5)</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>المسافة من رأس الصفحة (سم):</label>
+                <select id="topMarginSelect">
+                    <option value="3.5cm">3.5 سم (الافتراضي)</option>
+                    <option value="4.0cm">4.0 سم</option>
+                    <option value="4.5cm">4.5 سم</option>
+                    <option value="5.0cm">5.0 سم</option>
+                    <option value="5.5cm">5.5 سم</option>
+                    <option value="6.0cm">6.0 سم</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- قسم النصوص -->
+        <h3 style="margin-bottom: 15px; color: #1e3a5f; margin-top: 30px;">📝 تخصيص صياغة النصوص</h3>
+        <div class="hint-box">
+            💡 <strong>ملاحظة هامة:</strong> المخالفات تُسحب تلقائياً من تبويب (المخالفات والشواهد). هنا يمكنك فقط تعديل المقدمة والخاتمة.
+        </div>
+
+        <details>
+            <summary>📄 صياغة الخطاب الموجه للمدير</summary>
+            <div class="field" style="margin-bottom: 10px;">
+                <label>التحية:</label>
+                <textarea id="letterGreeting" style="min-height: 60px;"></textarea>
+            </div>
+            <div class="field" style="margin-bottom: 10px;">
+                <label>المقدمة (سيتم دمج المدرسة والتاريخ والمخالفات تلقائياً بعدها):</label>
+                <textarea id="letterIntro" style="min-height: 60px;"></textarea>
+            </div>
+            <div class="field">
+                <label>الخاتمة:</label>
+                <textarea id="letterConclusion" style="min-height: 60px;"></textarea>
+            </div>
+        </details>
+
+        <details>
+            <summary>📋 صياغة محضر الزيارة</summary>
+            <div class="field" style="margin-bottom: 10px;">
+                <label>المقدمة (سيتم دمج المدرسة والتاريخ والمخالفات تلقائياً بعدها):</label>
+                <textarea id="visitIntro" style="min-height: 60px;"></textarea>
+            </div>
+            <div class="field">
+                <label>الخاتمة:</label>
+                <textarea id="visitConclusion" style="min-height: 60px;"></textarea>
+            </div>
+        </details>
+
+        <details>
+            <summary>✍️ صياغة التعهد</summary>
+            <div class="field" style="margin-bottom: 10px;">
+                <label>صيغة الإقرار (سيتم دمج اسم المتعهد ورقم الإقامة والمخالفات تلقائياً):</label>
+                <textarea id="pledgeIntro" style="min-height: 80px;"></textarea>
+            </div>
+            <div class="field">
+                <label>متن التعهد (سيتم دمج التاريخ تلقائياً):</label>
+                <textarea id="pledgeBody"></textarea>
+            </div>
+        </details>
+
+        <!-- قسم الخلفية -->
+        <div style="background: #fff3cd; padding: 20px; border-radius: 12px; border: 1px solid #ffe69c; margin-top: 20px;">
+            <h3 style="color: #856404; margin-bottom: 10px;">🖼️ رفع خلفية الهوية البصرية</h3>
+            <input type="file" id="bgUpload" accept="image/*" style="margin-bottom: 15px;">
+            <div id="bgPreviewContainer"></div>
+        </div>
+
+        <button id="saveSettingsBtn" style="background: var(--brand-green); margin-top: 20px; width: 100%; padding: 15px; font-size: 1.1rem;">
+            💾 حفظ جميع الإعدادات
+        </button>
+    </div>
+
+    <!-- تبويب المخالفات والشواهد -->
+    <div id="tabViolations" class="tab-content active">
+        <h2 style="margin-bottom: 20px; color: #1e3a5f;">⚠️ المخالفات والشواهد</h2>
+        
+        <div class="hint-box">
+            💡 حدد المخالفات التي تم رصدها. سيتم حفظ اختياراتك تلقائياً واستخدامها في جميع الوثائق. يمكنك إضافة مخالفات جديدة أو حذف القديمة.
+        </div>
+
+        <!-- إضافة مخالفة جديدة -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <input type="text" id="newViolationInput" placeholder="أدخل مخالفة جديدة لإضافتها للقائمة..." style="flex: 1;">
+            <button id="addViolationBtn" style="background: #1e3a5f;">+ إضافة للقائمة</button>
+        </div>
+
+        <!-- قائمة المخالفات -->
+        <div id="violationsListContainer" class="violation-list"></div>
+
+        <!-- رفع الصور -->
+        <div style="margin-top: 30px; border-top: 2px dashed #cbd5e1; padding-top: 20px;">
+            <h3 style="margin-bottom: 10px; color: #1e3a5f;">📸 صور الشواهد</h3>
+            <input type="file" id="eduImages" accept="image/*" multiple>
+            <div id="eduImagePreview" class="image-preview-area"></div>
+        </div>
+    </div>
+
+    <!-- تبويب إنتاج الوثائق -->
+    <div id="tabDocs" class="tab-content">
+        <h2 style="margin-bottom: 20px; color: #1e3a5f;">📄 إنتاج الوثائق</h2>
+        
+        <div class="form-grid">
+            <div class="field"><label>التاريخ الهجري (لهذه الوثيقة)</label><input type="text" id="docDate"></div>
+            <div class="field"><label>اسم المتعهد (للتعهد)</label><input type="text" id="docWorkerName"></div>
+            <div class="field"><label>رقم إقامة المتعهد</label><input type="text" id="docWorkerIqama"></div>
+        </div>
+
+        <div class="docs-actions">
+            <button id="btnLetter" style="background: #1e3a5f;">📄 إنتاج الخطاب (مع الصور)</button>
+            <button id="btnVisit" style="background: #2c5a8c;">📋 إنتاج محضر الزيارة</button>
+            <button id="btnPledge" style="background: var(--brand-green);">✍️ إنتاج التعهد</button>
+        </div>
+        
+        <div id="previewContainer" style="display:none; background: #e2e8f0; padding: 20px; border-radius: 12px; overflow: auto; margin-top: 20px;"></div>
+    </div>
+
+    <!-- تذييل البرنامج -->
+    <div class="app-footer no-print">
+        المساعد في خطابات مخالفات المقصف - برمجة الموجه الصحي / محمد قطابري راجحي بالذكاء الاصطناعي
+    </div>
+</div>
+
+<script>
+    (function() {
+        let uploadedImages = [];
+        let backgroundImageBase64 = "";
+        
+        const initialViolations = [
+            "بيع مواد غير مسموح بها",
+            "وجود حشرات أو قوارض",
+            "بيع مواد منتهية الصلاحية",
+            "عدم وجود شهادة صحية للعامل",
+            "عدم نظافة أدوات الطهي أو التقديم",
+            "أن العامل ليس على كفالة الشركة المشغلة"
+        ];
+
+        let defaultViolations = JSON.parse(localStorage.getItem('defaultViolations')) || initialViolations;
+        let selectedViolations = JSON.parse(localStorage.getItem('selectedViolations')) || [];
+
+        const defaultTexts = {
+            letterGreeting: "السلام عليكم ورحمة الله وبركاته،",
+            letterIntro: "نفيدكم بأنه قد تم رصد المخالفات التالية على متعهد المقصف المدرسي:",
+            letterConclusion: "عليه نأمل من سعادتكم بعد الاطلاع تطبيق الشروط الجزائية.\n\nوالله يحفظكم ويرعاكم،،،",
+            
+            visitIntro: "تم زيارة المقصف المدرسي، وتم رصد المخالفات التالية على متعهد المقصف:",
+            visitConclusion: "عليه تم تحرير هذا المحضر لإثبات الحالة.",
+            
+            pledgeIntro: "أتعهد أنا الموقع أدناه بعدم تكرار المخالفات التالية مستقبلاً وإزالتها من المقصف:",
+            pledgeBody: "والله على ما أقول شهيد،،،"
+        };
+
+        // ==========================================
+        // 1. إدارة المخالفات
+        // ==========================================
+        
+        function renderViolations() {
+            const container = document.getElementById('violationsListContainer');
+            container.innerHTML = '';
+            
+            defaultViolations.forEach(v => {
+                const isChecked = selectedViolations.includes(v) ? 'checked' : '';
+                const div = document.createElement('div');
+                div.className = 'violation-item';
+                div.innerHTML = `
+                    <label>
+                        <input type="checkbox" value="${v}" ${isChecked} onchange="toggleViolation(this)">
+                        ${v}
+                    </label>
+                    <button class="btn-danger" onclick="deleteViolation('${v}')">✖ حذف</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.toggleViolation = function(checkbox) {
+            const val = checkbox.value;
+            if (checkbox.checked) {
+                if (!selectedViolations.includes(val)) selectedViolations.push(val);
+            } else {
+                selectedViolations = selectedViolations.filter(v => v !== val);
+            }
+            localStorage.setItem('selectedViolations', JSON.stringify(selectedViolations));
+        };
+
+        window.deleteViolation = function(val) {
+            if (confirm('هل أنت متأكد من حذف هذه المخالفة من القائمة؟')) {
+                defaultViolations = defaultViolations.filter(v => v !== val);
+                selectedViolations = selectedViolations.filter(v => v !== val);
+                localStorage.setItem('defaultViolations', JSON.stringify(defaultViolations));
+                localStorage.setItem('selectedViolations', JSON.stringify(selectedViolations));
+                renderViolations();
+            }
+        };
+
+        document.getElementById('addViolationBtn').onclick = function() {
+            const input = document.getElementById('newViolationInput');
+            const val = input.value.trim();
+            if (val && !defaultViolations.includes(val)) {
+                defaultViolations.push(val);
+                selectedViolations.push(val); 
+                localStorage.setItem('defaultViolations', JSON.stringify(defaultViolations));
+                localStorage.setItem('selectedViolations', JSON.stringify(selectedViolations));
+                input.value = '';
+                renderViolations();
+            }
+        };
+
+        // ==========================================
+        // 2. الإعدادات والنصوص
+        // ==========================================
+
+        function applyStyles(hFont, hSize, tFont, tSize, lHeight, tMargin) {
+            document.documentElement.style.setProperty('--font-heading', hFont);
+            document.documentElement.style.setProperty('--size-heading', hSize);
+            document.documentElement.style.setProperty('--font-text', tFont);
+            document.documentElement.style.setProperty('--size-text', tSize);
+            document.documentElement.style.setProperty('--line-height', lHeight);
+            document.documentElement.style.setProperty('--top-margin', tMargin);
+        }
+
+        function loadSettings() {
+            // تم تعديل الأسماء الافتراضية لتكون عامة
+            document.getElementById('schoolName').value = localStorage.getItem('schoolName') || "اسم المدرسة";
+            document.getElementById('principalName').value = localStorage.getItem('principalName') || "اسم مدير المدرسة";
+            document.getElementById('healthSupervisor').value = localStorage.getItem('healthSupervisor') || "اسم الموجه الصحي";
+            document.getElementById('defaultDate').value = localStorage.getItem('defaultDate') || "1448/05/15";
+            document.getElementById('directorName').value = localStorage.getItem('directorName') || "مدير عام التعليم";
+            document.getElementById('workerName').value = localStorage.getItem('workerName') || "اسم المتعهد";
+            document.getElementById('workerIqama').value = localStorage.getItem('workerIqama') || "0000000000";
+            
+            const hFont = localStorage.getItem('headingFont') || "'Cairo', sans-serif";
+            const hSize = localStorage.getItem('headingSize') || "20pt";
+            const tFont = localStorage.getItem('textFont') || "'Cairo', sans-serif";
+            const tSize = localStorage.getItem('textSize') || "16pt";
+            const lHeight = localStorage.getItem('lineHeight') || "1.8";
+            const tMargin = localStorage.getItem('topMargin') || "3.5cm";
+
+            document.getElementById('headingFontSelect').value = hFont;
+            document.getElementById('headingSizeSelect').value = hSize;
+            document.getElementById('textFontSelect').value = tFont;
+            document.getElementById('textSizeSelect').value = tSize;
+            document.getElementById('lineHeightSelect').value = lHeight;
+            document.getElementById('topMarginSelect').value = tMargin;
+
+            applyStyles(hFont, hSize, tFont, tSize, lHeight, tMargin);
+
+            for (let key in defaultTexts) {
+                document.getElementById(key).value = localStorage.getItem(key) || defaultTexts[key];
+            }
+
+            backgroundImageBase64 = localStorage.getItem('bgImage') || "";
+            if (backgroundImageBase64) {
+                showBgPreview(backgroundImageBase64);
+            }
+
+            document.getElementById('docDate').value = document.getElementById('defaultDate').value;
+            document.getElementById('docWorkerName').value = document.getElementById('workerName').value;
+            document.getElementById('docWorkerIqama').value = document.getElementById('workerIqama').value;
+        }
+
+        document.getElementById('saveSettingsBtn').onclick = function() {
+            localStorage.setItem('schoolName', document.getElementById('schoolName').value);
+            localStorage.setItem('principalName', document.getElementById('principalName').value);
+            localStorage.setItem('healthSupervisor', document.getElementById('healthSupervisor').value);
+            localStorage.setItem('defaultDate', document.getElementById('defaultDate').value);
+            localStorage.setItem('directorName', document.getElementById('directorName').value);
+            localStorage.setItem('workerName', document.getElementById('workerName').value);
+            localStorage.setItem('workerIqama', document.getElementById('workerIqama').value);
+            
+            const hFont = document.getElementById('headingFontSelect').value;
+            const hSize = document.getElementById('headingSizeSelect').value;
+            const tFont = document.getElementById('textFontSelect').value;
+            const tSize = document.getElementById('textSizeSelect').value;
+            const lHeight = document.getElementById('lineHeightSelect').value;
+            const tMargin = document.getElementById('topMarginSelect').value;
+
+            localStorage.setItem('headingFont', hFont);
+            localStorage.setItem('headingSize', hSize);
+            localStorage.setItem('textFont', tFont);
+            localStorage.setItem('textSize', tSize);
+            localStorage.setItem('lineHeight', lHeight);
+            localStorage.setItem('topMargin', tMargin);
+
+            applyStyles(hFont, hSize, tFont, tSize, lHeight, tMargin);
+
+            for (let key in defaultTexts) {
+                localStorage.setItem(key, document.getElementById(key).value);
+            }
+            
+            if (backgroundImageBase64) {
+                localStorage.setItem('bgImage', backgroundImageBase64);
+            }
+            
+            alert("✅ تم حفظ جميع الإعدادات بنجاح!");
+            
+            document.getElementById('docDate').value = document.getElementById('defaultDate').value;
+            document.getElementById('docWorkerName').value = document.getElementById('workerName').value;
+            document.getElementById('docWorkerIqama').value = document.getElementById('workerIqama').value;
+        };
+
+        document.getElementById('bgUpload').onchange = function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    backgroundImageBase64 = ev.target.result;
+                    showBgPreview(backgroundImageBase64);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        function showBgPreview(src) {
+            document.getElementById('bgPreviewContainer').innerHTML = `
+                <p style="color: green; font-weight: bold; margin-bottom: 10px;">✓ تم اختيار الخلفية بنجاح</p>
+                <img src="${src}" style="max-height: 200px; border: 1px solid #ccc;">
+            `;
+        }
+
+        // ==========================================
+        // 3. إنتاج الوثائق
+        // ==========================================
+
+        function getSchool() { return document.getElementById('schoolName').value || "المدرسة"; }
+        function getPrincipal() { return document.getElementById('principalName').value || "مدير المدرسة"; }
+        function getSupervisor() { return document.getElementById('healthSupervisor').value || "الموجه الصحي"; }
+        function getDirector() { return document.getElementById('directorName').value || "الجهة"; }
+        function getDate() { return document.getElementById('docDate').value; }
+        function getWorker() { return document.getElementById('docWorkerName').value; }
+        function getIqama() { return document.getElementById('docWorkerIqama').value; }
+
+        function formatText(str) {
+            if (!str) return '';
+            return str.split('\n').filter(line => line.trim() !== '').map(line => `<p>${line}</p>`).join('');
+        }
+
+        function getViolationsHTML() {
+            if (selectedViolations.length === 0) return '<p>لم يتم تحديد أي مخالفات.</p>';
+            let html = '<ul class="violations-ul">';
+            selectedViolations.forEach(v => {
+                html += `<li>${v}</li>`;
+            });
+            html += '</ul>';
+            return html;
+        }
+
+        function wrapInPaper(contentHtml) {
+            const bgStyle = backgroundImageBase64 ? `background-image: url('${backgroundImageBase64}');` : 'background-color: white;';
+            return `
+            <div class="official-paper" style="${bgStyle}">
+                <div class="paper-content">
+                    ${contentHtml}
+                </div>
+            </div>
+            `;
+        }
+
+        function buildLetter() {
+            let imagesHtml = '';
+            if (uploadedImages.length > 0) {
+                imagesHtml = '<div class="images-grid">';
+                uploadedImages.forEach(img => { imagesHtml += `<img src="${img}">`; });
+                imagesHtml += '</div>';
+            }
+
+            const content = `
+                <p style="font-weight:bold;">سعادة/ ${getDirector()} &nbsp;&nbsp;&nbsp; سلمه الله</p>
+                ${formatText(localStorage.getItem('letterGreeting'))}
+                ${formatText(localStorage.getItem('letterIntro'))}
+                <p><strong>المدرسة:</strong> ${getSchool()} &nbsp;|&nbsp; <strong>التاريخ:</strong> ${getDate()}هـ</p>
+                
+                ${getViolationsHTML()}
+                
+                ${formatText(localStorage.getItem('letterConclusion'))}
+                
+                <div style="margin-top: 20px; text-align: left; padding-left: 30px;">
+                    <p style="font-weight:bold;">مدير المدرسة</p>
+                    <p style="margin-top: 20px;">${getPrincipal()}</p>
+                </div>
+
+                ${imagesHtml}
+            `;
+            return wrapInPaper(content);
+        }
+
+        function buildVisit() {
+            const content = `
+                <div class="doc-title">محضر زيارة المقصف بالمدرسة</div>
+                
+                <p><strong>المدرسة:</strong> ${getSchool()} &nbsp;|&nbsp; <strong>التاريخ:</strong> ${getDate()}هـ</p>
+                ${formatText(localStorage.getItem('visitIntro'))}
+                
+                ${getViolationsHTML()}
+                
+                ${formatText(localStorage.getItem('visitConclusion'))}
+
+                <div class="signatures">
+                    <div class="sig-box">
+                        <p>الموجه الصحي</p>
+                        <div style="margin-top: 30px;">${getSupervisor()}</div>
+                    </div>
+                    <div class="sig-box">
+                        <p>مدير المدرسة</p>
+                        <div style="margin-top: 30px;">${getPrincipal()}</div>
+                    </div>
+                </div>
+            `;
+            return wrapInPaper(content);
+        }
+
+        function buildPledge() {
+            let violationsText = "";
+            if (selectedViolations.length > 0) {
+                violationsText = selectedViolations.map((v, i) => `${i+1}. ${v}`).join('<br>');
+            }
+
+            const content = `
+                <div class="doc-title" style="margin-top: 20px; margin-bottom: 30px;">تعهد بعدم تكرار مخالفة في مقصف المدرسة</div>
+                
+                <div style="text-align: center;">
+                    <p><strong>أتعهد أنا/</strong> ${getWorker()} &nbsp;&nbsp;&nbsp;&nbsp; <strong>إقامة رقم/</strong> ${getIqama()}</p>
+                    
+                    ${formatText(localStorage.getItem('pledgeIntro'))}
+                    
+                    <div style="text-align: right; padding-right: 20px; margin: 15px 0; font-weight: bold; color: #1e3a5f;">
+                        ${violationsText}
+                    </div>
+                    
+                    ${formatText(localStorage.getItem('pledgeBody'))}
+                    <p><strong>التاريخ:</strong> ${getDate()}هـ</p>
+                </div>
+
+                <div style="margin-top: 40px; text-align: right; padding-right: 50px;">
+                    <p style="font-weight: bold;">اسم المتعهد: ${getWorker()}</p>
+                    <p style="font-weight: bold; margin-top: 20px;">التوقيع: ........................</p>
+                </div>
+            `;
+            return wrapInPaper(content);
+        }
+
+        // ==========================================
+        // 4. المعاينة والطباعة
+        // ==========================================
+
+        function showPreview(builder) {
+            if (!backgroundImageBase64) {
+                alert("⚠️ تنبيه: لم تقم برفع خلفية الهوية البصرية. يرجى الذهاب لتبويب (الإعدادات) ورفع الخلفية أولاً.");
+            }
+
+            const container = document.getElementById('previewContainer');
+            container.style.display = 'block';
+            container.innerHTML = `
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between;">
+                    <button class="print-btn" style="background: #008A76; padding: 10px 20px; font-size: 16px;">🖨️ طباعة الوثيقة (A4)</button>
+                    <button onclick="document.getElementById('previewContainer').style.display='none'" style="background: #dc3545;">إغلاق المعاينة</button>
+                </div>
+                <div style="background: #cbd5e1; padding: 20px; display: flex; justify-content: center;">
+                    ${builder()}
+                </div>
+            `;
+            
+            container.querySelector('.print-btn').onclick = () => printDocument(builder);
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function printDocument(builder) {
+            const htmlContent = builder();
+            const win = window.open('', '_blank');
+            
+            if (!win) {
+                alert('يرجى السماح بالنوافذ المنبثقة للطباعة.');
+                return;
+            }
+
+            const hFont = document.getElementById('headingFontSelect').value;
+            const hSize = document.getElementById('headingSizeSelect').value;
+            const tFont = document.getElementById('textFontSelect').value;
+            const tSize = document.getElementById('textSizeSelect').value;
+            const lHeight = document.getElementById('lineHeightSelect').value;
+            const tMargin = document.getElementById('topMarginSelect').value;
+
+            win.document.open();
+            win.document.write(`
+                <!DOCTYPE html>
+                <html dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>طباعة الوثيقة</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&family=Almarai:wght@400;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+                    <style>
+                        :root {
+                            --font-heading: ${hFont};
+                            --size-heading: ${hSize};
+                            --font-text: ${tFont};
+                            --size-text: ${tSize};
+                            --line-height: ${lHeight};
+                            --top-margin: ${tMargin};
+                        }
+                        * { box-sizing: border-box; }
+                        body { margin: 0; padding: 0; background: white; }
+                        
+                        .official-paper {
+                            background-color: white;
+                            background-size: cover;
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            width: 100%;
+                            height: 100vh;
+                            position: relative;
+                            direction: rtl;
+                            color: #000;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                            overflow: hidden;
+                            page-break-inside: avoid;
+                        }
+
+                        .paper-content {
+                            position: absolute;
+                            top: var(--top-margin) !important;
+                            right: 3.1cm;
+                            left: 3.1cm;
+                            bottom: 1.75cm;
+                            font-family: var(--font-text) !important;
+                            font-size: var(--size-text) !important;
+                            line-height: var(--line-height) !important;
+                            display: flex;
+                            flex-direction: column;
+                        }
+
+                        .paper-content p { margin-bottom: 10px; }
+                        .paper-content p:last-child { margin-bottom: 0; }
+
+                        .doc-title { 
+                            text-align: center; 
+                            font-family: var(--font-heading) !important;
+                            font-size: var(--size-heading) !important;
+                            font-weight: bold; 
+                            margin-bottom: 20px; 
+                            text-decoration: underline; 
+                            text-underline-offset: 8px; 
+                        }
+                        
+                        .violations-ul { margin-right: 25px; margin-bottom: 15px; list-style-type: disc; }
+                        .violations-ul li { margin-bottom: 5px; }
+
+                        .images-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; flex-shrink: 0; }
+                        .images-grid img { width: 100%; height: 90px; object-fit: cover; border: 1px solid #ccc; border-radius: 4px; }
+                        
+                        .signatures { display: flex; justify-content: space-between; margin-top: 30px; padding-top: 10px; font-size: var(--size-text) !important; font-weight: bold; flex-shrink: 0; }
+                        .sig-box { text-align: center; width: 200px; }
+
+                        @page { size: A4; margin: 0; }
+                    </style>
+                </head>
+                <body>
+                    ${htmlContent}
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                window.onafterprint = function() { window.close(); };
+                            }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        }
+
+        // ==========================================
+        // 5. الأحداث والصور والتبويبات
+        // ==========================================
+
+        document.getElementById('eduImages').onchange = function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (uploadedImages.length < 6 && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        uploadedImages.push(ev.target.result);
+                        renderImages();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            this.value = '';
+        };
+
+        function renderImages() {
+            const container = document.getElementById('eduImagePreview');
+            container.innerHTML = '';
+            uploadedImages.forEach((src, index) => {
+                const div = document.createElement('div');
+                div.style.position = 'relative';
+                div.innerHTML = `
+                    <img src="${src}" class="img-preview">
+                    <button style="position:absolute;top:-5px;right:-5px;padding:2px 8px;background:red;border-radius:50%;font-size:10px;border:none;cursor:pointer;" onclick="removeImage(${index})">✖</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.removeImage = function(index) {
+            uploadedImages.splice(index, 1);
+            renderImages();
+        };
+
+        document.getElementById('btnLetter').onclick = () => showPreview(buildLetter);
+        document.getElementById('btnVisit').onclick = () => showPreview(buildVisit);
+        document.getElementById('btnPledge').onclick = () => showPreview(buildPledge);
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = function() {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(this.dataset.tab).classList.add('active');
+                this.classList.add('active');
+            };
+        });
+
+        // التهيئة
+        loadSettings();
+        renderViolations();
+    })();
+</script>
+</body>
+</html>
